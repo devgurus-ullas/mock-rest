@@ -2,7 +2,7 @@ package com.devgurus.mockrest.entities;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "REQUESTS")
 public class MockRequestEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
