@@ -1,6 +1,7 @@
 package com.devgurus.mockrest.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "REQUESTS")
 public class MockRequestEntity {
@@ -22,6 +23,9 @@ public class MockRequestEntity {
 
     @Column
     private String responseBody;
+
+    @OneToMany(cascade=CascadeType.ALL)
+    private List<MockRequestHeaderEntity> headers;
 
     public long getId() {
         return id;
@@ -69,5 +73,13 @@ public class MockRequestEntity {
 
     public void setResponseBody(String responseBody) {
         this.responseBody = responseBody;
+    }
+
+    public List<MockRequestHeaderEntity> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<MockRequestHeaderEntity> headers) {
+        this.headers = headers;
     }
 }
