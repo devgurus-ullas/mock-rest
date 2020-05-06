@@ -2,8 +2,10 @@ package com.devgurus.mockrest.services.helper;
 
 import com.devgurus.mockrest.entities.MockRequestEntity;
 import com.devgurus.mockrest.entities.MockRequestHeaderEntity;
+import com.devgurus.mockrest.entities.MockRequestParamEntity;
 import com.devgurus.mockrest.models.MockRequestHeaderModel;
 import com.devgurus.mockrest.models.MockRequestModel;
+import com.devgurus.mockrest.models.MockRequestParamModel;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class ServiceHelper {
             entity.setResponseBody(model.getResponseBody());
             entity.setUrl(model.getUrl());
             entity.setHeaders(modelToEntityRequestHeaders(model.getHeaders()));
+            entity.setParams(modelToEntityRequestParams(model.getParams()));
             return entity;
         }
         return null;
@@ -37,6 +40,7 @@ public class ServiceHelper {
             model.setResponseBody(entity.getResponseBody());
             model.setUrl(entity.getUrl());
             model.setHeaders(entityToModelRequestHeaders(entity.getHeaders()));
+            model.setParams(entityToModelRequestParams(entity.getParams()));
             return model;
         }
         return null;
@@ -110,5 +114,53 @@ public class ServiceHelper {
         }
         return models;
     }
-    
+
+
+
+    public MockRequestParamEntity modelToEntity(MockRequestParamModel model){
+        if(model != null){
+            MockRequestParamEntity entity = new MockRequestParamEntity();
+            entity.setParamId(model.getParamId());
+            entity.setEnabled(model.isEnabled());
+            entity.setKey(model.getKey());
+            entity.setValue(model.getKey());
+            entity.setRegex(model.isRegex());
+            return entity;
+        }
+        return null;
+    }
+
+    public MockRequestParamModel entityToModel(MockRequestParamEntity entity){
+        if(entity != null){
+            MockRequestParamModel model = new MockRequestParamModel();
+            model.setParamId(entity.getParamId());
+            model.setEnabled(entity.isEnabled());
+            model.setKey(entity.getKey());
+            model.setValue(entity.getKey());
+            model.setRegex(entity.isRegex());
+
+            return model;
+        }
+        return null;
+    }
+
+    public List<MockRequestParamEntity> modelToEntityRequestParams(List<MockRequestParamModel> models){
+        List<MockRequestParamEntity> entities= new ArrayList<>();
+        if(models!= null && !models.isEmpty()){
+            for(MockRequestParamModel model :models){
+                entities.add(modelToEntity(model));
+            }
+        }
+        return entities;
+    }
+
+    public List<MockRequestParamModel> entityToModelRequestParams(List<MockRequestParamEntity> entities){
+        List<MockRequestParamModel> models= new ArrayList<>();
+        if(entities!= null && !entities.isEmpty()){
+            for(MockRequestParamEntity entity  :entities){
+                models.add(entityToModel(entity));
+            }
+        }
+        return models;
+    }
 }
