@@ -27,6 +27,9 @@ public class MockRequestEntity {
     @OneToMany(cascade=CascadeType.ALL)
     private List<MockRequestHeaderEntity> headers;
 
+    @OneToMany(cascade=CascadeType.ALL)
+    private List<MockRequestParamEntity> params;
+
     public long getId() {
         return id;
     }
@@ -81,5 +84,13 @@ public class MockRequestEntity {
 
     public void setHeaders(List<MockRequestHeaderEntity> headers) {
         this.headers = headers;
+    }
+
+    public List<MockRequestParamEntity> getParams() {
+        return params;
+    }
+
+    public void setParams(List<MockRequestParamEntity> params) {
+        this.params = params;
     }
 }

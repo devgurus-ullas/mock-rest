@@ -20,6 +20,8 @@ public class MockRequestModel {
 
     private List<MockRequestHeaderModel> headers;
 
+    private List<MockRequestParamModel> params;
+
     public long getId() {
         return id;
     }
@@ -74,5 +76,13 @@ public class MockRequestModel {
 
     public void setHeaders(List<MockRequestHeaderModel> headers) {
         this.headers = headers;
+    }
+
+    public List<MockRequestParamModel> getParams() {
+        return params;
+    }
+
+    public void setParams(List<MockRequestParamModel> params) {
+        this.params = params;
     }
 }
