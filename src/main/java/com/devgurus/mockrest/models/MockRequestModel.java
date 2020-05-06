@@ -1,5 +1,9 @@
 package com.devgurus.mockrest.models;
 
+import com.devgurus.mockrest.entities.MockRequestHeaderEntity;
+
+import java.util.List;
+
 public class MockRequestModel {
 
     private long id;
@@ -13,6 +17,8 @@ public class MockRequestModel {
     private String requestContent;
 
     private String responseBody;
+
+    private List<MockRequestHeaderModel> headers;
 
     public long getId() {
         return id;
@@ -60,5 +66,13 @@ public class MockRequestModel {
 
     public void setResponseBody(String responseBody) {
         this.responseBody = responseBody;
+    }
+
+    public List<MockRequestHeaderModel> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<MockRequestHeaderModel> headers) {
+        this.headers = headers;
     }
 }

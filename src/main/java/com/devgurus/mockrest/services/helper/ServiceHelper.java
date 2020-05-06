@@ -1,6 +1,8 @@
 package com.devgurus.mockrest.services.helper;
 
 import com.devgurus.mockrest.entities.MockRequestEntity;
+import com.devgurus.mockrest.entities.MockRequestHeaderEntity;
+import com.devgurus.mockrest.models.MockRequestHeaderModel;
 import com.devgurus.mockrest.models.MockRequestModel;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ public class ServiceHelper {
             entity.setRequestMethod(model.getRequestMethod());
             entity.setResponseBody(model.getResponseBody());
             entity.setUrl(model.getUrl());
+            entity.setHeaders(modelToEntityRequestHeaders(model.getHeaders()));
             return entity;
         }
         return null;
@@ -33,6 +36,7 @@ public class ServiceHelper {
             model.setRequestMethod(entity.getRequestMethod());
             model.setResponseBody(entity.getResponseBody());
             model.setUrl(entity.getUrl());
+            model.setHeaders(entityToModelRequestHeaders(entity.getHeaders()));
             return model;
         }
         return null;
@@ -57,4 +61,54 @@ public class ServiceHelper {
         }
         return models;
     }
+
+
+    public MockRequestHeaderEntity modelToEntity(MockRequestHeaderModel model){
+        if(model != null){
+            MockRequestHeaderEntity entity = new MockRequestHeaderEntity();
+            entity.setHeaderId(model.getHeaderId());
+            entity.setEnabled(model.isEnabled());
+            entity.setKey(model.getKey());
+            entity.setValue(model.getKey());
+            entity.setRegex(model.isRegex());
+
+            return entity;
+        }
+        return null;
+    }
+
+    public MockRequestHeaderModel entityToModel(MockRequestHeaderEntity entity){
+        if(entity != null){
+            MockRequestHeaderModel model = new MockRequestHeaderModel();
+            model.setHeaderId(entity.getHeaderId());
+            model.setEnabled(entity.isEnabled());
+            model.setKey(entity.getKey());
+            model.setValue(entity.getKey());
+            model.setRegex(entity.isRegex());
+
+            return model;
+        }
+        return null;
+    }
+
+    public List<MockRequestHeaderEntity> modelToEntityRequestHeaders(List<MockRequestHeaderModel> models){
+        List<MockRequestHeaderEntity> entities= new ArrayList<>();
+        if(models!= null && !models.isEmpty()){
+            for(MockRequestHeaderModel model :models){
+                entities.add(modelToEntity(model));
+            }
+        }
+        return entities;
+    }
+
+    public List<MockRequestHeaderModel> entityToModelRequestHeaders(List<MockRequestHeaderEntity> entities){
+        List<MockRequestHeaderModel> models= new ArrayList<>();
+        if(entities!= null && !entities.isEmpty()){
+            for(MockRequestHeaderEntity entity  :entities){
+                models.add(entityToModel(entity));
+            }
+        }
+        return models;
+    }
+    
 }
