@@ -44,6 +44,7 @@ public class SetUpController {
         List<MockRequestEntity> entities = requestService.getAll();
         List<MockRequestModel> models = serviceHelper.entityToModel(entities);
         return new ResponseEntity<>(models, HttpStatus.OK);
+//testcommit
     }
 
     @DeleteMapping(value = "/{requestId}")
