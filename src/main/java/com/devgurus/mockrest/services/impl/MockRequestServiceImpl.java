@@ -40,4 +40,12 @@ public class MockRequestServiceImpl implements MockRequestService {
     public void delete(long id) {
         requestDAO.deleteById(id);
     }
+
+    @Override
+    public List<MockRequestEntity> findRequests(String url, String method) {
+        return requestDAO.findAllByUrlAndRequestMethod(url,method);
+    }
+
+
+
 }

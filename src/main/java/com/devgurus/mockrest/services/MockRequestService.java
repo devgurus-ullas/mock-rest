@@ -16,4 +16,6 @@ public interface MockRequestService {
 
     void delete(long id);
 
+    List<MockRequestEntity> findRequests(String url,String method);
+
 }
