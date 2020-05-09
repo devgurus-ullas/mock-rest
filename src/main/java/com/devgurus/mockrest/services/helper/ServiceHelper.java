@@ -77,7 +77,7 @@ public class ServiceHelper {
             entity.setHeaderId(model.getHeaderId());
             entity.setEnabled(model.isEnabled());
             entity.setKey(model.getKey());
-            entity.setValue(model.getKey());
+            entity.setValue(model.getValue());
             entity.setRegex(model.isRegex());
 
             return entity;
@@ -91,7 +91,7 @@ public class ServiceHelper {
             model.setHeaderId(entity.getHeaderId());
             model.setEnabled(entity.isEnabled());
             model.setKey(entity.getKey());
-            model.setValue(entity.getKey());
+            model.setValue(entity.getValue());
             model.setRegex(entity.isRegex());
 
             return model;
@@ -127,7 +127,7 @@ public class ServiceHelper {
             entity.setParamId(model.getParamId());
             entity.setEnabled(model.isEnabled());
             entity.setKey(model.getKey());
-            entity.setValue(model.getKey());
+            entity.setValue(model.getValue());
             entity.setRegex(model.isRegex());
             return entity;
         }
@@ -140,7 +140,7 @@ public class ServiceHelper {
             model.setParamId(entity.getParamId());
             model.setEnabled(entity.isEnabled());
             model.setKey(entity.getKey());
-            model.setValue(entity.getKey());
+            model.setValue(entity.getValue());
             model.setRegex(entity.isRegex());
 
             return model;
@@ -175,7 +175,7 @@ public class ServiceHelper {
             entity.setRespHeaderId(model.getRespHeaderId());
             entity.setEnabled(model.isEnabled());
             entity.setKey(model.getKey());
-            entity.setValue(model.getKey());
+            entity.setValue(model.getValue());
             return entity;
         }
         return null;
@@ -187,7 +187,7 @@ public class ServiceHelper {
             model.setRespHeaderId(entity.getRespHeaderId());
             model.setEnabled(entity.isEnabled());
             model.setKey(entity.getKey());
-            model.setValue(entity.getKey());
+            model.setValue(entity.getValue());
             return model;
         }
         return null;

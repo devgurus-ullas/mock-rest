@@ -3,7 +3,6 @@ package com.devgurus.mockrest.controllers;
 import com.devgurus.mockrest.entities.MockRequestEntity;
 import com.devgurus.mockrest.entities.MockRequestHeaderEntity;
 import com.devgurus.mockrest.entities.MockRequestParamEntity;
-import com.devgurus.mockrest.models.MockRequestModel;
 import com.devgurus.mockrest.services.MockRequestService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/mockserver/**")
@@ -28,51 +25,125 @@ public class MockController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> captureRequestGet(HttpServletRequest request,@RequestHeader HttpHeaders httpHeaders){
-        analyseRequest(request,httpHeaders);
+    public ResponseEntity<Object> captureRequestGet(HttpServletRequest request,@RequestHeader HttpHeaders httpHeaders,@RequestParam Map<String, String> parameters){
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
     @PostMapping
-    public ResponseEntity<Object> captureRequestPost(HttpServletRequest request,@RequestHeader HttpHeaders httpHeaders){
-        analyseRequest(request,httpHeaders);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<Object> captureRequestPost(
+            HttpServletRequest request,@RequestHeader HttpHeaders httpHeaders,
+            @RequestParam Map<String, String> parameters , @RequestBody(required = false) String requestBody){
+        List<MockRequestEntity> results = analyseRequest(request, httpHeaders,parameters,requestBody);
+        HttpStatus responseStatus = HttpStatus.OK;
+        String responseBody;
+        if(results.isEmpty()){
+            responseBody="No matching records found!!!";
+            responseStatus= HttpStatus.NOT_FOUND;
+        }else if (results.size()>1){
+            responseBody="multiple ambiguous records found for given inputs !!!";
+            responseStatus= HttpStatus.CONFLICT;
+        }else{
+            MockRequestEntity result = results.get(0);
+            responseBody = result.getResponseBody();
+
+        }
+
+
+
+        return new ResponseEntity<>(responseBody,responseStatus);
     }
 
-    private List<MockRequestEntity> analyseRequest(HttpServletRequest request,HttpHeaders httpHeaders){
+    private List<MockRequestEntity> analyseRequest(HttpServletRequest request, HttpHeaders httpHeaders, Map<String, String> parameters , String requestBody){
         String method = request.getMethod();
         String url = request.getRequestURI();
         url = url.substring(12);
-
         Map<String,String> headerMap=httpHeaders.toSingleValueMap();
-
         List<MockRequestEntity> results = mockRequestService.findRequests(url, method);
-        System.out.println(method + "-" + url);
-        System.out.println(results.size());
-        results=filterByRequestHeaders(results,headerMap);
-        System.out.println("After filter result!!!");
-        System.out.println(results.size());
-        return null;
+
+        if(results!=null && !results.isEmpty()){
+            results=filterByRequestBody(results,requestBody);
+        }
+
+        if(results!=null && !results.isEmpty()){
+            results=filterByRequestHeaders(results,headerMap);
+        }
+
+        if(results!=null && !results.isEmpty()){
+            results=filterByRequestParams(results,parameters);
+        }
+
+        return results;
     }
 
     private List<MockRequestEntity> filterByRequestHeaders(List<MockRequestEntity> results, Map<String, String> headerMap) {
         List<MockRequestEntity> filteredRequests = new ArrayList<>();
-        for(MockRequestEntity request: results){
-            List<MockRequestHeaderEntity> headers = request.getHeaders();
-            Stream<MockRequestHeaderEntity> activeHeaders = headers.stream().filter(h -> h.isEnabled());
-            activeHeaders.
+        for(MockRequestEntity mockRequest: results){
+            List<MockRequestHeaderEntity> mockHeaders = mockRequest.getHeaders();
+            if(isAllHeadersPresent(mockHeaders,headerMap)){
+                filteredRequests.add(mockRequest);
+            }
+        }
+        return filteredRequests;
+    }
+
+    private List<MockRequestEntity> filterByRequestParams(List<MockRequestEntity> results, Map<String, String> headerMap) {
+        List<MockRequestEntity> filteredRequests = new ArrayList<>();
+        for(MockRequestEntity mockRequest: results){
+            List<MockRequestParamEntity> mockRequestParams = mockRequest.getParams();
+            if(isAllParamsPresent(mockRequestParams,headerMap)){
+                filteredRequests.add(mockRequest);
+            }
+        }
+        return filteredRequests;
+    }
+
+    private List<MockRequestEntity> filterByRequestBody(List<MockRequestEntity> results, String requestBody) {
+        List<MockRequestEntity> filteredRequests = new ArrayList<>();
+        for(MockRequestEntity mockRequest: results){
+            String mockRequestBody = mockRequest.getResponseBody();
+            if(mockRequestBody == null && requestBody == null ){
+                filteredRequests.add(mockRequest);
+            }else if(mockRequestBody != null && requestBody!= null && mockRequestBody.equals(requestBody) ){
+                    filteredRequests.add(mockRequest);
+            }
 
         }
         return filteredRequests;
     }
 
-    private boolean isPresentInMap(Map<String, String> map, String searchKey ,String searchValue){
+    private boolean isAllHeadersPresent(List<MockRequestHeaderEntity> mockHeaders, Map<String, String> headerMap) {
+
+        for(MockRequestHeaderEntity mockHeader: mockHeaders){
+            if(!isPresentInMap(headerMap,mockHeader.getKey(),mockHeader.getValue(),mockHeader.isRegex())){
+                  return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isAllParamsPresent(List<MockRequestParamEntity> mockHeaders, Map<String, String> headerMap) {
+
+        for(MockRequestParamEntity mockParam: mockHeaders){
+            if(!isPresentInMap(headerMap,mockParam.getKey(),mockParam.getValue(),mockParam.isRegex())){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isPresentInMap(Map<String, String> map, String searchKey ,String searchValue,boolean isRegex){
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if(entry.getKey().equals(searchKey) && entry.getValue().equals(searchValue)){
+            if(isRegex){
                 return true;
+            }else {
+                if(entry.getKey().equals(searchKey) && entry.getValue().equals(searchValue)){
+                    return true;
+                }
             }
+
         }
         return false;
     }
