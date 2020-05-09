@@ -3,6 +3,7 @@ package com.devgurus.mockrest.controllers;
 import com.devgurus.mockrest.entities.MockRequestEntity;
 import com.devgurus.mockrest.entities.MockRequestHeaderEntity;
 import com.devgurus.mockrest.entities.MockRequestParamEntity;
+import com.devgurus.mockrest.entities.MockResponseHeaderEntity;
 import com.devgurus.mockrest.services.MockRequestService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ public class MockController {
             @RequestParam Map<String, String> parameters , @RequestBody(required = false) String requestBody){
         List<MockRequestEntity> results = analyseRequest(request, httpHeaders,parameters,requestBody);
         HttpStatus responseStatus = HttpStatus.OK;
+        HttpHeaders responseHeaders = null;
         String responseBody;
         if(results.isEmpty()){
             responseBody="No matching records found!!!";
@@ -47,12 +49,21 @@ public class MockController {
         }else{
             MockRequestEntity result = results.get(0);
             responseBody = result.getResponseBody();
-
+            responseHeaders = populateResponseHeaders(result);
         }
 
 
 
-        return new ResponseEntity<>(responseBody,responseStatus);
+        return new ResponseEntity<>(responseBody,responseHeaders,responseStatus);
+    }
+
+    private HttpHeaders populateResponseHeaders(MockRequestEntity request){
+        HttpHeaders headers = new HttpHeaders();
+        List<MockResponseHeaderEntity> mockHeaders = request.getResponseHeaders();
+        for (MockResponseHeaderEntity mockHeader : mockHeaders ) {
+            headers.add(mockHeader.getKey(),mockHeader.getValue());
+        }
+        return headers;
     }
 
     private List<MockRequestEntity> analyseRequest(HttpServletRequest request, HttpHeaders httpHeaders, Map<String, String> parameters , String requestBody){
@@ -102,7 +113,7 @@ public class MockController {
     private List<MockRequestEntity> filterByRequestBody(List<MockRequestEntity> results, String requestBody) {
         List<MockRequestEntity> filteredRequests = new ArrayList<>();
         for(MockRequestEntity mockRequest: results){
-            String mockRequestBody = mockRequest.getResponseBody();
+            String mockRequestBody = mockRequest.getRequestContent();
             if(mockRequestBody == null && requestBody == null ){
                 filteredRequests.add(mockRequest);
             }else if(mockRequestBody != null && requestBody!= null && mockRequestBody.equals(requestBody) ){
